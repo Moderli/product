@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Search</title>
+    <style>
+        /* General Styles */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+
+        header {
+            background-color: #007BFF;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin: 0;
+        }
+
+        form {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            max-width: 400px;
+            margin: 20px auto;
+        }
+
+        label {
+            font-weight: bold;
+        }
+
+        input[type="text"],
+        input[type="number"] {
+            padding: 8px;
+            font-size: 1rem;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            padding: 10px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #218838;
+        }
+
+        .logout-button {
+            padding: 10px;
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background-color 0.3s;
+        }
+
+        .logout-button:hover {
+            background-color: #c82333;
+        }
+
+        /* Raw Data Section */
+        section h2 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: #007BFF;
+        }
+
+        pre {
+            background-color: #333;
+            color: white;
+            padding: 15px;
+            border-radius: 5px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        /* Results Section */
+        .search-results {
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .result-source {
+            margin-bottom: 20px;
+        }
+
+        .result-source h3 {
+            font-size: 1.25rem;
+            color: #007BFF;
+            margin-bottom: 10px;
+        }
+
+        .result-source ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .result-source li {
+            background-color: #fff;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .result-source a {
+            color: #007BFF;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .result-source a:hover {
+            text-decoration: underline;
+        }
+
+        .result-source p {
+            font-size: 1rem;
+            color: #555;
+        }
+
+        /* Empty State */
+        .result-source p {
+            font-size: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Product Search Deal buddy</h1>
+        <!-- Search Form -->
+        <form method="get" action="{% url 'product_search' %}">
+            <label for="product">Enter Product Name:</label>
+            <input type="text" id="product" name="product" value="{{ product|default:'' }}" required>
+
+            <label for="count">Number of Results:</label>
+            <input type="number" id="count" name="count" value="{{ count|default:10 }}" min="1" max="50" required>
+
+            <button type="submit">Search</button>
+        </form>
+
+        <!-- Logout Button -->
+        <form method="post" action="{% url 'logout' %}">
+            {% csrf_token %}
+            <button type="submit" class="logout-button">Logout</button>
+        </form>
+    </header>
+
+    <!-- Display raw JSON data for debugging purposes -->
+
+    {% if master_data %}
+    <section class="search-results">
+        <h2>Search Results for "{{ product }}"</h2>
+        {% for source, items in master_data.items %}
+            <div class="result-source">
+                <h3>{{ source|title }}</h3>
+                <ul>
+                    {% for item in items %}
+                        <li>
+                            <h4><a href="{{ item.item_link }}" target="_blank">{{ item.item_name }}</a></h4>
+                            <p>Price: {{ item.item_price|default:"Not Available" }}</p>
+                            <p>Description: {{ item.item_rating|default:"Not Available" }}</p>
+                            {% if item.item_image != 'Unavailable' %}
+                                <img src="{{ item.item_image }}" alt="{{ item.item_name }}" style="max-width: 200px; height: auto;">
+                            {% else %}
+                                <p>Image not available</p>
+                            {% endif %}
+                        </li>
+                    {% empty %}
+                        <p>No results found on {{ source|title }}.</p>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endfor %}
+    </section>
+{% else %}
+    <p>No search results yet. Please enter a product to search.</p>
+{% endif %}
+</body>
+</html>

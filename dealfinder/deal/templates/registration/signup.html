@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - Best Deal Finder</title>
+    <style>
+        /* General Styles */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+
+        header {
+            background-color: #007BFF;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin: 0;
+        }
+
+        /* Sign Up Form Styling */
+        .signup-form {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            margin: 50px auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .signup-form input {
+            padding: 12px;
+            font-size: 1rem;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            width: 100%;
+        }
+
+        .signup-form button {
+            padding: 12px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .signup-form button:hover {
+            background-color: #0056b3;
+        }
+
+        /* Link Styling */
+        .signup-form p {
+            text-align: center;
+            font-size: 1rem;
+        }
+
+        .signup-form a {
+            color: #007BFF;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .signup-form a:hover {
+            text-decoration: underline;
+        }
+
+        /* Error Styling */
+        .error-message {
+            color: red;
+            font-size: 0.9rem;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div>
+            <h1>Deal Buddy Signup</h1>
+            <img src="https://www.shutterstock.com/image-illustration/red-price-tag-label-percentage-600nw-1947684382.jpg" style="height: 100px; width: 100px; border-radius: 50px;">
+        </div>
+    </header>
+
+    <div class="signup-form">
+        <form id="signupForm" method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <div id="errorMessages" class="error-message"></div>
+            <button type="submit">Sign Up</button>
+        </form>
+        <p>Already have an account? <a href="{% url 'login' %}">Login</a></p>
+    </div>
+
+    <script>
+        // JavaScript for form validation
+        document.getElementById('signupForm').addEventListener('submit', function(event) {
+            let errorMessages = [];
+            const username = document.querySelector('input[name="username"]');
+            const email = document.querySelector('input[name="email"]');
+            const password = document.querySelector('input[name="password"]');
+            const confirmPassword = document.querySelector('input[name="confirm_password"]');
+
+            // Clear previous error messages
+            document.getElementById('errorMessages').innerHTML = '';
+            
+            // Username validation
+            if (!username.value.trim()) {
+                errorMessages.push('Username is required.');
+            }
+
+            // Email validation
+            const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+            if (!email.value.trim() || !emailPattern.test(email.value)) {
+                errorMessages.push('Please enter a valid email address.');
+            }
+
+            // Password validation
+            if (!password.value.trim()) {
+                errorMessages.push('Password is required.');
+            }
+
+            // Confirm password validation
+            if (password.value !== confirmPassword.value) {
+                errorMessages.push('Passwords do not match.');
+            }
+
+            // Display errors if any
+            if (errorMessages.length > 0) {
+                event.preventDefault();  // Prevent form submission
+                document.getElementById('errorMessages').innerHTML = errorMessages.join('<br>');
+                document.getElementById('errorMessages').style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>
